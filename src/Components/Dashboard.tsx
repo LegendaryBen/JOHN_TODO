@@ -1,7 +1,6 @@
 import { useState } from "react";
 import TodoItem from "../Components2/Todo-Items";
 
-
 const initialTodos = [
   { id: 1, text: "Learn React", completed: false },
   { id: 2, text: "Build a Todo App", completed: true },
@@ -14,11 +13,11 @@ const Dashboard = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newTodoText, setNewTodoText] = useState("");
 
-  const handleDelete = (id:number) => {
+  const handleDelete = (id: number) => {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  const handleComplete = (id:number) => {
+  const handleComplete = (id: number) => {
     setTodos(
       todos.map((todo) =>
         todo.id === id ? { ...todo, completed: true } : todo
@@ -26,7 +25,7 @@ const Dashboard = () => {
     );
   };
 
-  const handleEdit = (id:number, newText:string) => {
+  const handleEdit = (id: number, newText: string) => {
     setTodos(
       todos.map((todo) =>
         todo.id === id ? { ...todo, text: newText } : todo
@@ -46,6 +45,10 @@ const Dashboard = () => {
     setShowCreateForm(false);
   };
 
+  const handleLogout = () => {
+    alert("Logged out!");
+  };
+
   const filteredTodos = todos.filter((todo) =>
     filter === "all"
       ? true
@@ -56,10 +59,16 @@ const Dashboard = () => {
 
   return (
     <div className="form-container dashboard">
-      <h2>User Dashboard</h2>
+      <div className="dashboard-header">
+        <h2>User Dashboard</h2>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      </div>
 
       <div className="top-bar">
-        <button className="new-todo-btn" onClick={() => setShowCreateForm(!showCreateForm)}>
+        <button
+          className="new-todo-btn"
+          onClick={() => setShowCreateForm(!showCreateForm)}
+        >
           + New Todo
         </button>
       </div>

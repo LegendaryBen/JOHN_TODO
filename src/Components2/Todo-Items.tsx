@@ -19,7 +19,7 @@ const TodoItem = ({ todo, onDelete, onComplete, onEdit }) => {
           onChange={(e) => setNewText(e.target.value)}
         />
       ) : (
-        <span>{todo.text}</span>
+        <div>{todo.text}</div>
       )}
 
       <div className="actions">
