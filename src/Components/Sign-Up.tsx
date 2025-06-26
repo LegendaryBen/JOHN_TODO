@@ -56,19 +56,15 @@ const SignUpForm = () => {
 
         setMessage("User has been created!")
 
-        console.log('User created:', response.data);
-
         navigate('/login')
 
-      } catch (error) {
+      } catch (e:unknown) {
 
         setLoader(false)
 
         handleClick()
 
-        setMessage("An error occured while trying to create an account. Make sure Input fields are not empty");
-
-        console.error('Error creating user:', error);
+        setMessage(e.response.data.error);
 
       }
   }

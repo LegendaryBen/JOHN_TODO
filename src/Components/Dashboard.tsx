@@ -1,5 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TodoItem from "../Components2/Todo-Items";
+import axios from "axios";
+import Loader from "../Components2/Loader";
+import Snackbar from '@mui/material/Snackbar';
+
+
 
 const initialTodos = [
   { id: 1, text: "Learn React", completed: false },
@@ -8,46 +13,273 @@ const initialTodos = [
 ];
 
 const Dashboard = () => {
+
+  const [loader, setLoader] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
   const [todos, setTodos] = useState(initialTodos);
   const [filter, setFilter] = useState("all");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newTodoText, setNewTodoText] = useState("");
+  const [message, setMessage] = useState<string>('');
+  const apiUrl:string = import.meta.env.VITE_API_URL;
 
-  const handleDelete = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+
+
+
+  const handleClick = () => {
+    setOpen(true);
   };
 
-  const handleComplete = (id: number) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: true } : todo
-      )
-    );
+
+
+  const handleClose = (event:Event|undefined, reason:string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
   };
 
-  const handleEdit = (id: number, newText: string) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, text: newText } : todo
-      )
-    );
+
+
+  const handleDelete = async (id: number) => {
+
+     setLoader(true)
+
+     try {
+        const response = await axios.delete(apiUrl+`/Todos/${id}`);
+
+        setMessage("");
+
+        setLoader(false);
+
+        handleClick()
+
+        console.log('Item deleted successfully:', response.data);
+
+      } catch (error) {
+
+        if (axios.isAxiosError(error)) {
+
+          console.error('Axios error:', error.response?.data || error.message);
+
+          setMessage("");
+
+          setLoader(false);
+
+          handleClick()
+
+        } else {
+
+          console.error('Unexpected error:', error);
+
+          setMessage("");
+
+          setLoader(false);
+
+          handleClick()
+
+        }
+      }
+
+    // setTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  const handleAddTodo = () => {
+
+
+
+  const handleComplete = async (id: number) => {
+
+    let text:string|null = null;
+    
+    todos.forEach((todo)=>{
+      if(todo.id == id){
+        text = todo.text;
+      }
+    })
+
+    setLoader(true)
+
+       try {
+
+        const response = await axios.patch(apiUrl+`/Todos/${id}`, {
+          title: text,
+          completed: true,
+        });
+
+
+        setMessage("");
+
+        setLoader(false);
+
+        handleClick()
+
+        console.log('Item updated successfully:', response.data);
+
+      } catch (error) {
+
+        if (axios.isAxiosError(error)) {
+
+          console.error('Axios error:', error.response?.data || error.message);
+
+          
+          setMessage("");
+
+          setLoader(false);
+
+          handleClick()
+
+
+        } else {
+
+          console.error('Unexpected error:', error);
+
+          
+          setMessage("");
+
+          setLoader(false);
+
+          handleClick()
+
+        }
+
+      }
+
+
+
+
+    // setTodos(
+    //   todos.map((todo) =>
+    //     todo.id === id ? { ...todo, completed: true } : todo
+    //   )
+    // );
+  };
+
+
+
+  const handleEdit = async (id: number, newText: string) => {
+
+      setLoader(true)
+
+       try {
+
+        const response = await axios.patch(apiUrl+`/Todos/${id}`, {
+          title: newText,
+          completed: false,
+        });
+
+
+        setMessage("");
+
+        setLoader(false);
+
+        handleClick()
+
+        console.log('Item updated successfully:', response.data);
+
+      } catch (error) {
+
+        if (axios.isAxiosError(error)) {
+
+          console.error('Axios error:', error.response?.data || error.message);
+
+          
+          setMessage("");
+
+          setLoader(false);
+
+          handleClick()
+
+
+        } else {
+
+          console.error('Unexpected error:', error);
+
+          
+          setMessage("");
+
+          setLoader(false);
+
+          handleClick()
+
+        }
+
+      }
+
+
+    // setTodos(
+    //   todos.map((todo) =>
+    //     todo.id === id ? { ...todo, text: newText } : todo
+    //   )
+    // );
+  };
+
+
+
+  const handleAddTodo = async () => {
+
     if (newTodoText.trim() === "") return;
-    const newTodo = {
-      id: Date.now(),
-      text: newTodoText.trim(),
-      completed: false,
-    };
-    setTodos([newTodo, ...todos]);
-    setNewTodoText("");
-    setShowCreateForm(false);
+
+      setLoader(true)
+
+       try {
+        const response = await axios.post(apiUrl+'/Todos', {
+          title: newTodoText,
+        });
+
+        setMessage("");
+
+        setLoader(false);
+
+        handleClick()
+
+        console.log('Item created successfully:', response.data);
+
+      } catch (error) {
+
+        if (axios.isAxiosError(error)) {
+
+          console.error('Axios error:', error.response?.data || error.message);
+
+          setMessage("");
+
+          setLoader(false);
+
+          handleClick()
+
+        } else {
+
+          console.error('Unexpected error:', error);
+
+          setMessage("");
+
+          setLoader(false);
+
+          handleClick()
+
+
+        }
+
+      }
+
+
+    // const newTodo = {
+    //   id: Date.now(),
+    //   text: newTodoText.trim(),
+    //   completed: false,
+    // };
+    // setTodos([newTodo, ...todos]);
+    // setNewTodoText("");
+    // setShowCreateForm(false);
   };
+
+
 
   const handleLogout = () => {
     alert("Logged out!");
   };
+
+
 
   const filteredTodos = todos.filter((todo) =>
     filter === "all"
@@ -56,6 +288,64 @@ const Dashboard = () => {
       ? !todo.completed
       : todo.completed
   );
+
+
+  
+  const fetchData = async () => {
+
+    setLoader(true)
+
+    try {
+
+      const response = await axios.get(apiUrl+`/Todos`);
+
+      console.log('Fetched data:', response.data);
+
+      setMessage("");
+
+      setLoader(false);
+
+      handleClick()
+
+    } catch (error) {
+
+      if (axios.isAxiosError(error)) {
+
+        console.error('Axios error:', error.response?.data || error.message);
+
+        setMessage("");
+
+        setLoader(false);
+
+        handleClick()
+
+
+      } else {
+
+        console.error('Unexpected error:', error);
+
+        setMessage("");
+
+        setLoader(false);
+
+        handleClick()
+
+      }
+
+    }
+
+
+  };
+
+
+  useEffect(()=>{
+
+    fetchData();
+
+  },[])
+
+
+
 
   return (
     <div className="form-container dashboard">
@@ -104,6 +394,13 @@ const Dashboard = () => {
       ) : (
         <p>No todos found.</p>
       )}
+      {loader && <Loader/>}
+        <Snackbar
+          open={open}
+          autoHideDuration={5000}
+          onClose={handleClose}
+          message={message}
+        />
     </div>
   );
 };
